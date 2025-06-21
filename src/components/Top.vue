@@ -18,17 +18,36 @@
             }
         },
         methods: {
-            secondLevel(id){
-                if (this.openedId2 == id) {
-                    return
-                };
-
+            getData(level, id) {
                 try {
-                    fetch(`http://localhost:5000/api/data/level/2/${id}`)
+                    let headers = new Headers();
+                    headers.append('Content-Type', 'application/json');
+                    headers.append('Accept', 'application/json');
+                    headers.append('Access-Control-Allow-Origin', '*');
+                    headers.append('Access-Control-Allow-Credentials', 'true');
+                    headers.append('GET', 'POST', 'OPTIONS');
+
+                    fetch(`${import.meta.env.VITE_API_URL}/api/data/level/${level}/${id}`, {
+                        method: 'GET',
+                        headers: headers,
+                    })
                         .then(response => response.json())
                         .then((data) => {
-                            this.data2 = data;
-                            this.openedId2 = id;
+                            switch (level) {
+                                case 1:
+                                    this.data = data;
+                                    break;
+                                case 2:
+                                    this.data2 = data;
+                                    this.openedId2 = id;
+                                    break;
+                                case 3:
+                                    this.data3 = data;
+                                    this.openedId3 = id;
+                                    break;
+                                default:
+                                    break;
+                            }
                         })
                         .catch((error) => {
                             this.error = error;
@@ -36,6 +55,14 @@
                 } catch (error) {
                     this.error = error;
                 }
+            },
+
+            secondLevel(id){
+                if (this.openedId2 == id) {
+                    return
+                };
+
+                this.getData(2, id);
             },
             thirdLevel(id, isterminal) {
                 if (isterminal == "Да") {
@@ -46,34 +73,11 @@
                     return
                 };
 
-                try {
-                    fetch(`http://localhost:5000/api/data/level/3/${id}`)
-                        .then(response => response.json())
-                        .then((data) => {
-                            this.data3 = data;
-                            this.openedId3 = id;
-                        })
-                        .catch((error) => {
-                            this.error = error;
-                        });
-                } catch (error) {
-                    this.error = error;
-                }
+                this.getData(3, id);
             }
         },
         mounted() {
-            try {
-                fetch('http://localhost:5000/api/data/level/1/0')
-                    .then(response => response.json())
-                    .then((data) => {
-                        this.data = data;
-                    })
-                    .catch((error) => {
-                        this.error = error;
-                    });
-            } catch (error) {
-                this.error = error;
-            }
+            this.getData(1, 0);
         }
     }
 </script>
